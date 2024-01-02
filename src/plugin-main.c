@@ -29,7 +29,6 @@ static char* team1_name = "Team 1";
 static char* team2_name = "Team 2";
 static char* team1_logo_path = NULL;
 static char* team2_logo_path = NULL;
-static char* scoreboard_background_path = NULL;
 
 static obs_hotkey_id increase_team1_hotkey;
 static obs_hotkey_id decrease_team1_hotkey;
@@ -43,7 +42,6 @@ void load_team_settings()
     team2_name = obs_data_get_string(obs_data_get_root(), "team2_name");
     team1_logo_path = obs_data_get_string(obs_data_get_root(), "team1_logo_path");
     team2_logo_path = obs_data_get_string(obs_data_get_root(), "team2_logo_path");
-    scoreboard_background_path = obs_data_get_string(obs_data_get_root(), "scoreboard_background_path");
 }
 
 void increase_team1_score(obs_hotkey_t* hotkey, obs_hotkey_id id, void* data)
@@ -120,5 +118,4 @@ void obs_module_unload(void)
     bfree(team2_name);
     bfree(team1_logo_path);
     bfree(team2_logo_path);
-    bfree(scoreboard_background_path);
 }

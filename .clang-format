@@ -116,7 +116,7 @@ AlignConsecutiveMacros:
   AcrossEmptyLines: false
   AcrossComments: true
 AllowShortBlocksOnASingleLine: Never
-AllowShortEnumsOnASingleLine: false
+AllowShortEnumsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLambdasOnASingleLine: None

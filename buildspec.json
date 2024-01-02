@@ -36,7 +36,7 @@
             "bundleId": "com.example.obs-plugintemplate"
         }
     },
-    "name": "obs-plugintemplate",
+    "name": "obs-test",
     "displayName": "OBS Plugin Template",
     "version": "1.0.0",
     "author": "Your Name Here",

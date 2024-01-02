@@ -23,50 +23,102 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("myplugin", "en-US")
 
-static obs_source_t* hello_text_source;
+static int team1_score = 0;
+static int team2_score = 0;
+static char* team1_name = "Team 1";
+static char* team2_name = "Team 2";
+static char* team1_logo_path = NULL;
+static char* team2_logo_path = NULL;
+static char* scoreboard_background_path = NULL;
 
-static obs_hotkey_id hotkey_id;
-static bool is_hello_visible = true;
+static obs_hotkey_id increase_team1_hotkey;
+static obs_hotkey_id decrease_team1_hotkey;
+static obs_hotkey_id increase_team2_hotkey;
+static obs_hotkey_id decrease_team2_hotkey;
+static obs_hotkey_id reset_scores_hotkey;
 
-void toggle_hello_visibility(obs_hotkey_t* hotkey, obs_hotkey_id id, void* data)
+void load_team_settings()
 {
-    is_hello_visible = !is_hello_visible;
-    obs_source_set_enabled(hello_text_source, is_hello_visible);
+    team1_name = obs_data_get_string(obs_data_get_root(), "team1_name");
+    team2_name = obs_data_get_string(obs_data_get_root(), "team2_name");
+    team1_logo_path = obs_data_get_string(obs_data_get_root(), "team1_logo_path");
+    team2_logo_path = obs_data_get_string(obs_data_get_root(), "team2_logo_path");
+    scoreboard_background_path = obs_data_get_string(obs_data_get_root(), "scoreboard_background_path");
+}
+
+void increase_team1_score(obs_hotkey_t* hotkey, obs_hotkey_id id, void* data)
+{
+    team1_score++;
+    blog(LOG_INFO, "%s Score: %d", team1_name, team1_score);
+}
+
+void decrease_team1_score(obs_hotkey_t* hotkey, obs_hotkey_id id, void* data)
+{
+    team1_score--;
+    blog(LOG_INFO, "%s Score: %d", team1_name, team1_score);
+}
+
+void increase_team2_score(obs_hotkey_t* hotkey, obs_hotkey_id id, void* data)
+{
+    team2_score++;
+    blog(LOG_INFO, "%s Score: %d", team2_name, team2_score);
+}
+
+void decrease_team2_score(obs_hotkey_t* hotkey, obs_hotkey_id id, void* data)
+{
+    team2_score--;
+    blog(LOG_INFO, "%s Score: %d", team2_name, team2_score);
+}
+
+void reset_scores(obs_hotkey_t* hotkey, obs_hotkey_id id, void* data)
+{
+    team1_score = 0;
+    team2_score = 0;
+    blog(LOG_INFO, "Scores reset to 0");
 }
 
 bool obs_module_load(void)
 {
-    hello_text_source = obs_source_create("text_gdiplus", "HelloWorld", NULL, NULL);
-    if (hello_text_source) {
-        obs_data_t* settings = obs_data_create();
-        obs_data_set_string(settings, "text", "Hello World!");
-        obs_source_update(hello_text_source, settings);
-        obs_data_release(settings);
+    blog(LOG_INFO, "Scoreboard Plugin loaded.");
 
-        obs_frontend_push_ui_translation("Hello World!");
+    load_team_settings();
 
-        blog(LOG_INFO, "Hello World! MyPlugin loaded.");
+    increase_team1_hotkey = obs_hotkey_register_frontend("IncreaseTeam1", "Increase Team 1 Score",
+                                                        increase_team1_score, NULL);
+    obs_hotkey_load(increase_team1_hotkey);
 
-        hotkey_id = obs_hotkey_register_frontend("ToggleHelloWorld", "Toggle Hello World Visibility",
-                                                toggle_hello_visibility, NULL);
-        obs_hotkey_load(hotkey_id);
+    decrease_team1_hotkey = obs_hotkey_register_frontend("DecreaseTeam1", "Decrease Team 1 Score",
+                                                        decrease_team1_score, NULL);
+    obs_hotkey_load(decrease_team1_hotkey);
 
-        return true;
-    }
+    increase_team2_hotkey = obs_hotkey_register_frontend("IncreaseTeam2", "Increase Team 2 Score",
+                                                        increase_team2_score, NULL);
+    obs_hotkey_load(increase_team2_hotkey);
 
-    return false;
+    decrease_team2_hotkey = obs_hotkey_register_frontend("DecreaseTeam2", "Decrease Team 2 Score",
+                                                        decrease_team2_score, NULL);
+    obs_hotkey_load(decrease_team2_hotkey);
+
+    reset_scores_hotkey = obs_hotkey_register_frontend("ResetScores", "Reset Scores",
+                                                      reset_scores, NULL);
+    obs_hotkey_load(reset_scores_hotkey);
+
+    return true;
 }
 
 void obs_module_unload(void)
 {
-    obs_frontend_pop_ui_translation();
+    blog(LOG_INFO, "Scoreboard Plugin unloaded.");
 
-    if (hello_text_source) {
-        obs_source_release(hello_text_source);
-        hello_text_source = NULL;
-    }
+    obs_hotkey_unregister(increase_team1_hotkey);
+    obs_hotkey_unregister(decrease_team1_hotkey);
+    obs_hotkey_unregister(increase_team2_hotkey);
+    obs_hotkey_unregister(decrease_team2_hotkey);
+    obs_hotkey_unregister(reset_scores_hotkey);
 
-    obs_hotkey_unregister(hotkey_id);
-
-    blog(LOG_INFO, "Goodbye World! MyPlugin unloaded.");
+    bfree(team1_name);
+    bfree(team2_name);
+    bfree(team1_logo_path);
+    bfree(team2_logo_path);
+    bfree(scoreboard_background_path);
 }
